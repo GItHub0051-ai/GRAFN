@@ -10,10 +10,10 @@ def Divide_Kpca(x):
     list_data = []
     x = x.cpu().detach().numpy()
     x = x.reshape(-1, 1)    # (80000, 1)
-    # 数据标准化
+    # Data standardization
     scaler = StandardScaler()
 
-    # 分批进行数据升维处理
+    # Data dimension augmentation is carried out in batches
     new_x = np.array_split(x, 100)
     for i in range(len(new_x)):
         data = new_x[i]
@@ -32,7 +32,7 @@ def Kmeans(x):
 
     x = Divide_Kpca(x)
 
-    # 分批进行K均值处理
+    # K-means processing is performed in batches
     kmeans = MiniBatchKMeans(n_clusters=2, n_init='auto')
     kmeans.fit(x)
     joblib.dump(kmeans, 'kmeans_model.joblib')
@@ -42,15 +42,8 @@ def Kmeans(x):
     return labels, centers
 
 if __name__ == "__main__":
-    # y = torch.randn(32, 50, 50, 2).reshape(-1, 2)
-    # model = joblib.load('E:\github files\CENew\CENet-main\CENet-main\kmeans_model.joblib')
-    # adj_matrix = model.fit_predict(y.cpu().detach().numpy())
-    # print(adj_matrix.shape)
-    # exit()
-    print("###########################")
     x = torch.load('adj_matrix')
     result = Kmeans(x)
-    print("###########################")
 
 
 
