@@ -9,3 +9,6 @@ The development of social media has made Multimodal Sentiment Analysis (MSA) a h
 4.	A structure is raised to adjust the sensitivity of features for downstream tasks.
 ## Conclusion
 In this paper, we propose a graph reconstruction attention fusion network, which organically combines the sequence features and structural information of multimodal data, and significantly improves the performance of MSA. In the future, it would be interesting to integrate GRAFN model into mobile terminals to detect human emotions in short videos in real time.
+
+# Acknowledgments
+Thanks for their great work: "Cross-modal Enhancement Network for Multimodal Sentiment Analysis" and "Learning Modality-Specific Representations with Self-Supervised Multi-Task Learning for Multimodal Sentiment Analysis".
