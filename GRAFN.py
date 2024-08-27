@@ -12,9 +12,9 @@ from thop import profile
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 # device = torch.device('cpu')
 
-class CE(nn.Module):
+class GRAFN(nn.Module):
     def __init__(self, ):
-        super(CE, self).__init__()
+        super(GRAFN, self).__init__()
         self.visual_embedding = nn.Embedding(label_size + 1, TEXT_DIM, padding_idx=label_size)
         self.acoustic_embedding = nn.Embedding(label_size + 1, TEXT_DIM, padding_idx=label_size)
         self.hv = SelfAttention(hidden_size)
@@ -69,9 +69,7 @@ class CE(nn.Module):
 
         # 声学表示学习
         acoustic_ = self.acoustic_embedding(acoustic_ids)
-        # torch.save(text_embedding, 'E:\\github files\\CENew\\CENet-main\\CENet-main\\feature_maps\\text_initial')
-        # torch.save(visual_, 'E:\\github files\\CENew\\CENet-main\\CENet-main\\feature_maps\\visual_initial')
-        # torch.save(acoustic_, 'E:\\github files\\CENew\\CENet-main\\CENet-main\\feature_maps\\acoustic_initial')
+
         # 定义邻接矩阵
         adj_aa = self.la(text_embedding, acoustic_)
 
@@ -84,12 +82,6 @@ class CE(nn.Module):
 
         shift_gcn_tt = self.GAT(shift_gcn_tt, adj_t) + shift_gcn_tt
 
-        # torch.save(shift_gcn_tt, 'E:\\github files\\CENew\\CENet-main\\CENet-main\\feature_maps\\text_graph')
-        # torch.save(shift_gcn_vv, 'E:\\github files\\CENew\\CENet-main\\CENet-main\\feature_maps\\visual_graph')
-        # torch.save(shift_gcn_aa, 'E:\\github files\\CENew\\CENet-main\\CENet-main\\feature_maps\\acoustic_graph')
-
-        # 跨模态交互
-        # 视觉嵌入文本
         visual_ = self.hv(shift_gcn_tt, shift_gcn_vv)
         visual_ = self.ffn(visual_)
 
@@ -103,11 +95,6 @@ class CE(nn.Module):
 
         # 残差连接
         embedding_shift = shift + text_embedding
-        # torch.save(embedding_shift, 'E:\\github files\\CENew\\CENet-main\\CENet-main\\feature_maps\\shift')
-        # torch.save(text_embedding, 'E:\\github files\\CENew\\CENet-main\\CENet-main\\feature_maps\\text_embedding')
-        # torch.save(visual_, 'E:\\github files\\CENew\\CENet-main\\CENet-main\\feature_maps\\visual_trans_wo_ce')
-        # torch.save(acoustic_, 'E:\\github files\\CENew\\CENet-main\\CENet-main\\feature_maps\\acoustic_trans_wo_ce')
-        # exit()
 
         return embedding_shift
 
@@ -352,13 +339,8 @@ class selfAttentionV(nn.Module):
 
         weight_score = torch.matmul(Q, K.transpose(-1, -2))
         weight_prob = nn.Softmax(dim=-1)(weight_score)
-        # torch.save(weight_prob, 'Text_matrix')
-        # exit()
-        # print('weight_prob:', weight_prob)
-        weight_prob = self.linear(weight_prob)
-        # print(weight_prob.shape)
 
-        # torch.save(weight_prob, 'adj_matrix')
+        weight_prob = self.linear(weight_prob)
 
         # 使用Kmeans聚类，讲权值划分为0或1
         weight_prob = weight_prob.cpu().detach().numpy()
@@ -367,9 +349,7 @@ class selfAttentionV(nn.Module):
 
         # 还原尺度
         adj_matrix = torch.FloatTensor(adj_matrix.reshape(b, 50, 50)).to(device)
-        # print('adj_matrix:', adj_matrix)
-        # torch.save(adj_matrix, 'with_GRS_test')
-        # exit()
+
         return adj_matrix
 
 class selfAttentionA(nn.Module):
@@ -398,13 +378,9 @@ class selfAttentionA(nn.Module):
 
         weight_score = torch.matmul(Q, K.transpose(-1, -2))
         weight_prob = nn.Softmax(dim=-1)(weight_score)
-        # torch.save(weight_prob, 'Text_matrix')
-        # exit()
-        # print('weight_prob:', weight_prob)
-        weight_prob = self.linear(weight_prob)
-        # print(weight_prob.shape)
 
-        # torch.save(weight_prob, 'adj_matrix')
+        weight_prob = self.linear(weight_prob)
+
 
         # 使用Kmeans聚类，讲权值划分为0或1
         weight_prob = weight_prob.cpu().detach().numpy()
@@ -413,9 +389,7 @@ class selfAttentionA(nn.Module):
 
         # 还原尺度
         adj_matrix = torch.FloatTensor(adj_matrix.reshape(b, 50, 50)).to(device)
-        # print('adj_matrix:', adj_matrix)
-        # torch.save(adj_matrix, 'with_GRS_test')
-        # exit()
+
         return adj_matrix
 
 class selfAttentionT(nn.Module):
@@ -444,13 +418,9 @@ class selfAttentionT(nn.Module):
 
         weight_score = torch.matmul(Q, K.transpose(-1, -2))
         weight_prob = nn.Softmax(dim=-1)(weight_score)
-        # torch.save(weight_prob, 'Text_matrix')
-        # exit()
-        # print('weight_prob:', weight_prob)
-        weight_prob = self.linear(weight_prob)
-        # print(weight_prob.shape)
 
-        # torch.save(weight_prob, 'adj_matrix')
+        weight_prob = self.linear(weight_prob)
+
 
         # 使用Kmeans聚类，讲权值划分为0或1
         weight_prob = weight_prob.cpu().detach().numpy()
@@ -459,9 +429,7 @@ class selfAttentionT(nn.Module):
 
         # 还原尺度
         adj_matrix = torch.FloatTensor(adj_matrix.reshape(b, 50, 50)).to(device)
-        # print('adj_matrix:', adj_matrix)
-        # torch.save(adj_matrix, 'with_GRS_test')
-        # exit()
+
         return adj_matrix
 
 # 前馈神经网络
@@ -491,65 +459,3 @@ if __name__ == "__main__":
     print('flops: %.2f M, params: %.2f M' % (flops / 1e6, params / 1e6))
     exit()
     print(output.shape)
-
-
-# import torch.nn as nn
-# from config.global_configs import *
-# device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
-# # device = torch.device('cpu')
-#
-# class CE(nn.Module):
-#     def __init__(self, ):
-#         super(CE, self).__init__()
-#         self.visual_embedding = nn.Embedding(label_size + 1, TEXT_DIM, padding_idx=label_size)
-#         self.acoustic_embedding = nn.Embedding(label_size + 1, TEXT_DIM, padding_idx=label_size)
-#         self.hv = SelfAttention(hidden_size)
-#         self.ha = SelfAttention(hidden_size)
-#         self.ht = SelfAttention(hidden_size)
-#         self.cat_connect = nn.Linear(2 * TEXT_DIM, TEXT_DIM)
-#
-#     def forward(self, text_embedding, visual_ids=None, acoustic_ids=None):
-#         visual_ = self.visual_embedding(visual_ids)
-#         acoustic_ = self.acoustic_embedding(acoustic_ids)
-#         visual_ = self.hv(text_embedding, visual_)
-#         acoustic_ = self.ha(text_embedding, acoustic_)
-#         visual_acoustic = torch.cat((visual_, acoustic_), dim=-1)
-#         shift = self.cat_connect(visual_acoustic)
-#         embedding_shift = shift + text_embedding
-#
-#         return embedding_shift
-#
-# class SelfAttention(nn.Module):
-#     def __init__(self, hidden_size, head_num=1):
-#         super(SelfAttention, self).__init__()
-#         self.head_num = head_num
-#         self.s_d = hidden_size // self.head_num
-#         self.all_head_size = self.head_num * self.s_d
-#         self.Wq = nn.Linear(hidden_size, hidden_size)
-#         self.Wk = nn.Linear(hidden_size, hidden_size)
-#         self.Wv = nn.Linear(hidden_size, hidden_size)
-#
-#     def transpose_for_scores(self, x):
-#         x = x.view(x.size(0), x.size(1), self.head_num, -1)
-#         return x.permute(0, 2, 1, 3)
-#
-#     def forward(self, text_embedding, embedding):
-#         Q = self.Wq(text_embedding)
-#         K = self.Wk(embedding)
-#         V = self.Wv(embedding)
-#
-#         Q = self.transpose_for_scores(Q)
-#         K = self.transpose_for_scores(K)
-#         V = self.transpose_for_scores(V)
-#
-#         weight_score = torch.matmul(Q, K.transpose(-1, -2))
-#         weight_prob = nn.Softmax(dim=-1)(weight_score * 8)
-#
-#         context_layer = torch.matmul(weight_prob, V)
-#         context_layer = context_layer.permute(0, 2, 1, 3).contiguous()
-#         new_context_layer_shape = context_layer.size()[:-2] + (self.all_head_size,)
-#         context_layer = context_layer.view(*new_context_layer_shape)
-#
-#         return context_layer
-
-
